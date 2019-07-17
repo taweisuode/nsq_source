@@ -11,10 +11,10 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/judwhite/go-svc/svc"
 	"github.com/mreiferson/go-options"
-	"github.com/nsqio/nsq/internal/app"
-	"github.com/nsqio/nsq/internal/lg"
-	"github.com/nsqio/nsq/internal/version"
 	"github.com/nsqio/nsq/nsqadmin"
+	"nsq/internal/app"
+	"nsq/internal/lg"
+	"nsq/internal/version"
 )
 
 func nsqadminFlagSet(opts *nsqadmin.Options) *flag.FlagSet {

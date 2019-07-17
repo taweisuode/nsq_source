@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/blang/semver"
-	"github.com/nsqio/nsq/internal/quantile"
+	"nsq/internal/quantile"
 )
 
 type ProducerTopic struct {

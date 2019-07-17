@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/nsqio/nsq/internal/lg"
+	"nsq/internal/lg"
 )
 
 type Options struct {
