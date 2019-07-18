@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"container/heap"
 	"errors"
+	"fmt"
 	"math"
 	"strings"
 	"sync"
@@ -302,6 +303,7 @@ func (c *Channel) PutMessage(m *Message) error {
 func (c *Channel) put(m *Message) error {
 	select {
 	case c.memoryMsgChan <- m:
+		fmt.Printf("memoryMsgChan  msg is [%+v]\n", string(m.Body))
 	default:
 		b := bufferPoolGet()
 		err := writeMessageToBackend(b, m, c.backend)

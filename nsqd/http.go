@@ -223,6 +223,7 @@ func (s *httpServer) doPUB(w http.ResponseWriter, req *http.Request, ps httprout
 	}
 
 	msg := NewMessage(topic.GenerateID(), body)
+	fmt.Printf("http msg is [%+v]\n", string(msg.Body))
 	msg.deferred = deferred
 	err = topic.PutMessage(msg)
 	if err != nil {

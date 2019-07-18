@@ -32,6 +32,8 @@ func (p *tcpServer) Handle(clientConn net.Conn) {
 	var prot protocol.Protocol
 	switch protocolMagic {
 	case "  V2":
+
+		//现在都是走 V2  协议   例如sub 请求数据 ["  V2 topic channel \n"]
 		prot = &protocolV2{ctx: p.ctx}
 	default:
 		protocol.SendFramedResponse(clientConn, frameTypeError, []byte("E_BAD_PROTOCOL"))

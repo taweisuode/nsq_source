@@ -48,6 +48,8 @@ func (p *protocolV2) IOLoop(conn net.Conn) error {
 	// and avoid a potential race with IDENTIFY (where a client
 	// could have changed or disabled said attributes)
 	messagePumpStartedChan := make(chan bool)
+
+	//启动goroutine  来 处理 消息的投递
 	go p.messagePump(client, messagePumpStartedChan)
 	<-messagePumpStartedChan
 
@@ -60,6 +62,8 @@ func (p *protocolV2) IOLoop(conn net.Conn) error {
 
 		// ReadSlice does not allocate new space for the data each request
 		// ie. the returned slice is only valid until the next call to it
+
+		//例如sub 请求数据 ["  V2 topic channel \n"]
 		line, err = client.Reader.ReadSlice('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -80,6 +84,7 @@ func (p *protocolV2) IOLoop(conn net.Conn) error {
 
 		p.ctx.nsqd.logf(LOG_DEBUG, "PROTOCOL(V2): [%s] %s", client, params)
 
+		//这里执行cmd 操作
 		var response []byte
 		response, err = p.Exec(client, params)
 		if err != nil {
@@ -231,6 +236,7 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 
 	for {
 		if subChannel == nil || !client.IsReadyForMessages() {
+			fmt.Println(11111)
 			// the client is not ready to receive messages...
 			memoryMsgChan = nil
 			backendMsgChan = nil
@@ -244,12 +250,14 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 			}
 			flushed = true
 		} else if flushed {
+			fmt.Println(22222)
 			// last iteration we flushed...
 			// do not select on the flusher ticker channel
 			memoryMsgChan = subChannel.memoryMsgChan
 			backendMsgChan = subChannel.backend.ReadChan()
 			flusherChan = nil
 		} else {
+			fmt.Println(3333333)
 			// we're buffered (if there isn't any more data we should flush)...
 			// select on the flusher ticker channel, too
 			memoryMsgChan = subChannel.memoryMsgChan
@@ -271,6 +279,8 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 			flushed = true
 		case <-client.ReadyStateChan:
 		case subChannel = <-subEventChan:
+
+			//这里就是 channel 注册时候会往这个chan 中投递
 			// you can't SUB anymore
 			subEventChan = nil
 		case identifyData := <-identifyEventChan:
@@ -319,6 +329,9 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 			}
 			flushed = false
 		case msg := <-memoryMsgChan:
+
+			//不管是 http 请求pub 或者tcp  pub  最终都是在这块接收memoryMsgChan 中的msg  然后遍历所有topic下的channel ，分别请求
+			fmt.Printf("msg is [%+v]\n", string(msg.Body))
 			if sampleRate > 0 && rand.Int31n(100) > sampleRate {
 				continue
 			}

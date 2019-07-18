@@ -3,6 +3,7 @@ package nsqd
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -274,6 +275,7 @@ func (t *Topic) messagePump() {
 		select {
 		case msg = <-memoryMsgChan:
 		case buf = <-backendChan:
+			fmt.Printf("topic msg is [%+v]\n", string(msg.Body))
 			msg, err = decodeMessage(buf)
 			if err != nil {
 				t.ctx.nsqd.logf(LOG_ERROR, "failed to decode message - %s", err)

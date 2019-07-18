@@ -17,9 +17,9 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/judwhite/go-svc/svc"
 	"github.com/mreiferson/go-options"
-	"github.com/nsqio/nsq/nsqd"
 	"nsq/internal/lg"
 	"nsq/internal/version"
+	"nsq/nsqd"
 )
 
 type tlsRequiredOption int
@@ -74,16 +74,19 @@ func (p *program) Start() error {
 	}
 	p.nsqd = nsqd
 
+	//启动时加载内存中的数据 topic  channel  msg
 	err = p.nsqd.LoadMetadata()
 	if err != nil {
 		logFatal("failed to load metadata - %s", err)
 	}
+	//处理磁盘中的数据
 	err = p.nsqd.PersistMetadata()
 	if err != nil {
 		logFatal("failed to persist metadata - %s", err)
 	}
 
 	go func() {
+		//这里是nsq main方法
 		err := p.nsqd.Main()
 		if err != nil {
 			p.Stop()
