@@ -236,7 +236,6 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 
 	for {
 		if subChannel == nil || !client.IsReadyForMessages() {
-			fmt.Println(11111)
 			// the client is not ready to receive messages...
 			memoryMsgChan = nil
 			backendMsgChan = nil
@@ -250,14 +249,14 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 			}
 			flushed = true
 		} else if flushed {
-			fmt.Println(22222)
+			fmt.Printf("subChannel is [%+v]\n", subChannel.name)
 			// last iteration we flushed...
 			// do not select on the flusher ticker channel
 			memoryMsgChan = subChannel.memoryMsgChan
 			backendMsgChan = subChannel.backend.ReadChan()
 			flusherChan = nil
 		} else {
-			fmt.Println(3333333)
+			fmt.Printf("subChannel is [%+v]\n,flush status is [%+v]\n", subChannel.name, flushed)
 			// we're buffered (if there isn't any more data we should flush)...
 			// select on the flusher ticker channel, too
 			memoryMsgChan = subChannel.memoryMsgChan
@@ -345,6 +344,7 @@ func (p *protocolV2) messagePump(client *clientV2, startedChan chan bool) {
 			}
 			flushed = false
 		case <-client.ExitChan:
+			fmt.Println(7654321)
 			goto exit
 		}
 	}
